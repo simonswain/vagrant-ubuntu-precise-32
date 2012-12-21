@@ -1,0 +1,10 @@
+Vagrant::Config.run do |config|
+  # Setup the box
+  config.vm.box = "ubuntu-precise-32"
+
+  # Some NFS testing
+  config.vm.share_folder("v-root", "/vagrant", ".", :nfs => true)
+
+  # Static host-only IP
+  config.vm.network :hostonly, "10.0.73.57"
+end
