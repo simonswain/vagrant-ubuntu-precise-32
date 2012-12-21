@@ -19,16 +19,12 @@ apt-get -y install vim emacs
 apt-get -y install nfs-common
 apt-get clean
 
-# Installing the virtualbox guest additions
+# Installing the virtualbox guest additions.
 apt-get -y install dkms
-# VBOX_VERSION=$(cat /home/vagrant/.vbox_version)
-VBOX_VERSION=4.1.12
-cd /tmp
-wget http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso
-mount -o loop VBoxGuestAdditions_$VBOX_VERSION.iso /mnt
-sh /mnt/VBoxLinuxAdditions.run
-umount /mnt
-rm VBoxGuestAdditions_$VBOX_VERSION.iso
+mount /dev/cdrom /media/cdrom
+# the "Could not find the X.Org..." error this generates can be safely ignored
+sh /media/cdrom/VBoxLinuxAdditions.run
+sudo umount /media/cdrom
 
 # Install Ruby from source in /opt so that users of Vagrant
 # can install their own Rubies using packages or however.

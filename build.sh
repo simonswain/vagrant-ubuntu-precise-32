@@ -1,20 +1,16 @@
 #!/bin/bash
 
+set -o nounset
+set -o errexit
+
 # make sure we have dependencies 
 hash mkisofs 2>/dev/null || { echo >&2 "ERROR: mkisofs not found.  Aborting."; exit 1; }
 
-# TODO install guest additions once box is intalled (currently box
-# self-installs with hardcoded version number)
+ISO_GUESTADDITIONS="/usr/share/virtualbox/VBoxGuestAdditions.iso"
 
-# ISO_GUESTADDITIONS="/usr/share/virtualbox/VBoxGuestAdditions.iso"
-
-# if [ ! -f $ISO_GUESTADDITIONS ]; then
-#     sudo apt-get install iso-guest-additions-iso
-# fi
-
-set -o nounset
-set -o errexit
-#set -o xtrace
+if [ ! -f $ISO_GUESTADDITIONS ]; then
+    sudo apt-get install iso-guest-additions-iso
+fi
 
 # Configurations
 BOX="ubuntu-precise-32"
@@ -64,7 +60,6 @@ mkdir -p "${FOLDER_ISO}"
 mkdir -p "${FOLDER_BUILD}"
 mkdir -p "${FOLDER_VBOX}"
 mkdir -p "${FOLDER_VBOX}/${BOX}"
-#mkdir -p "${FOLDER_ISO_CUSTOM}"
 mkdir -p "${FOLDER_ISO_INITRD}"
 
 ISO_FILENAME="${FOLDER_ISO}/${BASE_NAME}"
@@ -127,7 +122,6 @@ sudo cp isolinux.cfg ${FOLDER_ISO_CUSTOM}/isolinux/isolinux.cfg
 sudo chmod u+w ${FOLDER_ISO_CUSTOM}/isolinux/isolinux.bin
 
   # add post_install script
-#cp "${FOLDER_BASE}/post_install.conf" "${FOLDER_ISO_CUSTOM}"
 cp ${FOLDER_BASE}/rc.local ${FOLDER_ISO_CUSTOM}
 
 echo "Running mkisofs ..."
@@ -173,7 +167,6 @@ VBoxManage storageattach "${BOX}" \
     --type dvddrive \
     --medium "${FOLDER_ISO}/custom.iso"
 
-
 VBoxManage storagectl "${BOX}" \
     --name "SATA Controller" \
     --add sata \
@@ -206,15 +199,13 @@ echo ""
 VBoxManage modifyvm "${BOX}" \
     --natpf1 "guestssh,tcp,,2222,,22"
 
-
-# TODO
 # Attach guest additions iso
-# VBoxManage storageattach "${BOX}" \
-#     --storagectl "IDE Controller" \
-#     --port 1 \
-#     --device 0 \
-#     --type dvddrive \
-#     --medium "${ISO_GUESTADDITIONS}"
+VBoxManage storageattach "${BOX}" \
+    --storagectl "IDE Controller" \
+    --port 1 \
+    --device 0 \
+    --type dvddrive \
+    --medium "${ISO_GUESTADDITIONS}"
 
 VBoxManage startvm "${BOX}"
 #VBoxManage startvm "${BOX}" -type "headless"
@@ -222,6 +213,8 @@ VBoxManage startvm "${BOX}"
   # get private key
 curl --output "${FOLDER_BUILD}/id_rsa" "https://raw.github.com/mitchellh/vagrant/master/keys/vagrant"
 chmod 600 "${FOLDER_BUILD}/id_rsa"
+
+#ssh -i "${FOLDER_BUILD}/id_rsa" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 2222 vagrant@127.0.0.1
 
 #ssh -i "${FOLDER_BUILD}/id_rsa" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 2222 vagrant@127.0.0.1 "sudo shutdown -h now"
 
@@ -234,6 +227,14 @@ while VBoxManage list runningvms | grep "${BOX}" >/dev/null; do
 done
 
 echo ""
+
+# detach guest additions iso
+VBoxManage storageattach "${BOX}" \
+    --storagectl "IDE Controller" \
+    --port 1 \
+    --device 0 \
+    --type dvddrive \
+    --medium none
     
 VBoxManage modifyvm "${BOX}" --natpf1 delete "guestssh"
 
