@@ -14,9 +14,9 @@ fi
 
 # Configurations
 BOX="ubuntu-precise-32"
-BASE_NAME="ubuntu-12.04.1-alternate-i386.iso"
+BASE_NAME="ubuntu-12.04.2-alternate-i386.iso"
 ISO_URL="http://releases.ubuntu.com/precise/$BASE_NAME"
-ISO_MD5="b4512076d85a1056f8a35f91702d81f9"
+ISO_MD5="59aef6131a38c760445ddb555bc91f37"
 
 FOLDER_BASE=`pwd`
 FOLDER_ISO="${FOLDER_BASE}/iso"
