@@ -14,9 +14,16 @@ fi
 
 # Configurations
 BOX="ubuntu-precise-32"
-BASE_NAME="ubuntu-12.04.2-alternate-i386.iso"
-ISO_URL="http://releases.ubuntu.com/precise/$BASE_NAME"
-ISO_MD5="59aef6131a38c760445ddb555bc91f37"
+
+# Issues with guest additions need to be resolved
+#BASE_NAME="ubuntu-12.04.2-alternate-i386.iso"
+#ISO_URL="http://releases.ubuntu.com/precise/$BASE_NAME"
+#ISO_MD5="59aef6131a38c760445ddb555bc91f37"
+
+BASE_NAME="ubuntu-12.04.1-alternate-i386.iso"
+ISO_URL="http://old-releases.ubuntu.com/releases/12.04.1/$BASE_NAME"
+ISO_MD5="b4512076d85a1056f8a35f91702d81f9"
+
 
 FOLDER_BASE=`pwd`
 FOLDER_ISO="${FOLDER_BASE}/iso"
@@ -104,7 +111,7 @@ cd "${FOLDER_ISO_INITRD}"
 sudo gunzip -c "${FOLDER_ISO_CUSTOM}/install/initrd.gz.org" | sudo cpio -id
     #sudo chown $EUID:$EUID ${FOLDER_ISO_CUSTOM} -R
 cd "${FOLDER_BASE}"
-cp preseed.cfg "${FOLDER_ISO_INITRD}/preseed.cfg"
+sudo cp preseed.cfg "${FOLDER_ISO_INITRD}/preseed.cfg"
 cd "${FOLDER_ISO_INITRD}"
 sudo chown 0:0 * -R
 find . | sudo cpio --create --format='newc' | gzip  > ${FOLDER_ISO_CUSTOM}/install/initrd.gz
@@ -210,15 +217,9 @@ VBoxManage storageattach "${BOX}" \
 VBoxManage startvm "${BOX}"
 #VBoxManage startvm "${BOX}" -type "headless"
 
-  # get private key
+# get private key
 curl --output "${FOLDER_BUILD}/id_rsa" "https://raw.github.com/mitchellh/vagrant/master/keys/vagrant"
 chmod 600 "${FOLDER_BUILD}/id_rsa"
-
-#ssh -i "${FOLDER_BUILD}/id_rsa" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 2222 vagrant@127.0.0.1
-
-#ssh -i "${FOLDER_BUILD}/id_rsa" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 2222 vagrant@127.0.0.1 "sudo shutdown -h now"
-
-#ssh -i "${FOLDER_BUILD}/id_rsa" -o KbdInteractiveAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 2222 vagrant@127.0.0.1 "sudo shutdown -h now"
 
 echo -n "Waiting for machine to finish bootstrap install and shutdown "
 while VBoxManage list runningvms | grep "${BOX}" >/dev/null; do
