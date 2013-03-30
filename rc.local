@@ -14,18 +14,18 @@ echo "UseDNS no" >> /etc/ssh/sshd_config
 
 apt-get -y update
 apt-get -y upgrade
-apt-get -y install dkms linux-headers-$(uname -r) build-essential
+apt-get -y install dkms linux-headers-generic build-essential
+apt-get -y install xserver-xorg xserver-xorg-core
 apt-get -y install zlib1g-dev libssl-dev libreadline-gplv2-dev
-apt-get -y install vim emacs
+apt-get -y install vim
 apt-get -y install nfs-common
-#apt-get -y install virtualbox-guest-additions
 apt-get clean
 
-# Installing the virtualbox guest additions.
-mount /dev/cdrom /media/cdrom
-# the "Could not find the X.Org..." error this generates can be safely ignored
-sh /media/cdrom/VBoxLinuxAdditions.run
-sudo umount /media/cdrom
+wget -P /tmp http://download.virtualbox.org/virtualbox/4.2.8/VBoxGuestAdditions_4.2.8.iso
+mkdir /tmp/additions
+sudo mount -o loop /tmp/VBoxGuestAdditions_4.2.8.iso /tmp/additions >/dev/null
+sh /tmp/additions/VBoxLinuxAdditions.run
+sudo umount /tmp/additions
 
 # Install Ruby from source in /opt so that users of Vagrant
 # can install their own Rubies using packages or however.

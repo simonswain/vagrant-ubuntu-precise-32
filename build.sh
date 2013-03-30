@@ -16,13 +16,13 @@ fi
 BOX="ubuntu-precise-32"
 
 # Issues with guest additions need to be resolved
-#BASE_NAME="ubuntu-12.04.2-alternate-i386.iso"
-#ISO_URL="http://releases.ubuntu.com/precise/$BASE_NAME"
-#ISO_MD5="59aef6131a38c760445ddb555bc91f37"
+BASE_NAME="ubuntu-12.04.2-alternate-i386.iso"
+ISO_URL="http://releases.ubuntu.com/precise/$BASE_NAME"
+ISO_MD5="59aef6131a38c760445ddb555bc91f37"
 
-BASE_NAME="ubuntu-12.04.1-alternate-i386.iso"
-ISO_URL="http://old-releases.ubuntu.com/releases/12.04.1/$BASE_NAME"
-ISO_MD5="b4512076d85a1056f8a35f91702d81f9"
+#BASE_NAME="ubuntu-12.04.1-alternate-i386.iso"
+#ISO_URL="http://old-releases.ubuntu.com/releases/12.04.1/$BASE_NAME"
+#ISO_MD5="b4512076d85a1056f8a35f91702d81f9"
 
 
 FOLDER_BASE=`pwd`
@@ -195,11 +195,12 @@ VBoxManage storageattach "${BOX}" \
 #VBoxManage startvm "${BOX}" -type "headless"
 VBoxManage startvm "${BOX}"
 
-echo -n "Waiting for installer to finish "
+echo "Waiting for installer to finish "
 while VBoxManage list runningvms | grep "${BOX}" >/dev/null; do
-    sleep 20
     echo -n "."
+    sleep 30
 done
+
 echo ""
 
   # Forward SSH
@@ -221,10 +222,10 @@ VBoxManage startvm "${BOX}"
 curl --output "${FOLDER_BUILD}/id_rsa" "https://raw.github.com/mitchellh/vagrant/master/keys/vagrant"
 chmod 600 "${FOLDER_BUILD}/id_rsa"
 
-echo -n "Waiting for machine to finish bootstrap install and shutdown "
+echo "Waiting for machine to finish bootstrap install and shutdown "
 while VBoxManage list runningvms | grep "${BOX}" >/dev/null; do
-    sleep 20
     echo -n "."
+    sleep 30
 done
 
 echo ""
