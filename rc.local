@@ -21,9 +21,9 @@ apt-get -y install vim
 apt-get -y install nfs-common
 apt-get clean
 
-wget -P /tmp http://download.virtualbox.org/virtualbox/4.2.8/VBoxGuestAdditions_4.2.8.iso
+wget -P /tmp http://download.virtualbox.org/virtualbox/4.2.10/VBoxGuestAdditions_4.2.10.iso
 mkdir /tmp/additions
-sudo mount -o loop /tmp/VBoxGuestAdditions_4.2.8.iso /tmp/additions >/dev/null
+sudo mount -o loop /tmp/VBoxGuestAdditions_4.2.10.iso /tmp/additions >/dev/null
 sh /tmp/additions/VBoxLinuxAdditions.run
 sudo umount /tmp/additions
 

@@ -1,5 +1,5 @@
 #!/bin/bash
 
-apt-get install vagrant virtualbox-guest-additions-iso mkisofs nfs-kernel-server curl
+apt-get install vagrant mkisofs nfs-kernel-server curl
 
 

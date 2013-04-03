@@ -6,24 +6,12 @@ set -o errexit
 # make sure we have dependencies 
 hash mkisofs 2>/dev/null || { echo >&2 "ERROR: mkisofs not found.  Aborting."; exit 1; }
 
-ISO_GUESTADDITIONS="/usr/share/virtualbox/VBoxGuestAdditions.iso"
-
-if [ ! -f $ISO_GUESTADDITIONS ]; then
-    sudo apt-get install iso-guest-additions-iso
-fi
-
 # Configurations
 BOX="ubuntu-precise-32"
 
-# Issues with guest additions need to be resolved
 BASE_NAME="ubuntu-12.04.2-alternate-i386.iso"
 ISO_URL="http://releases.ubuntu.com/precise/$BASE_NAME"
 ISO_MD5="59aef6131a38c760445ddb555bc91f37"
-
-#BASE_NAME="ubuntu-12.04.1-alternate-i386.iso"
-#ISO_URL="http://old-releases.ubuntu.com/releases/12.04.1/$BASE_NAME"
-#ISO_MD5="b4512076d85a1056f8a35f91702d81f9"
-
 
 FOLDER_BASE=`pwd`
 FOLDER_ISO="${FOLDER_BASE}/iso"
@@ -203,24 +191,13 @@ done
 
 echo ""
 
-  # Forward SSH
-VBoxManage modifyvm "${BOX}" \
-    --natpf1 "guestssh,tcp,,2222,,22"
+VBoxManage modifyvm "${BOX}" --nic1 nat
 
-# Attach guest additions iso
-VBoxManage storageattach "${BOX}" \
-    --storagectl "IDE Controller" \
-    --port 1 \
-    --device 0 \
-    --type dvddrive \
-    --medium "${ISO_GUESTADDITIONS}"
+# make sure the VM can get DNS
+VBoxManage modifyvm "${BOX}" --natdnshostresolver1 on
 
-VBoxManage startvm "${BOX}"
 #VBoxManage startvm "${BOX}" -type "headless"
-
-# get private key
-curl --output "${FOLDER_BUILD}/id_rsa" "https://raw.github.com/mitchellh/vagrant/master/keys/vagrant"
-chmod 600 "${FOLDER_BUILD}/id_rsa"
+VBoxManage startvm "${BOX}"
 
 echo "Waiting for machine to finish bootstrap install and shutdown "
 while VBoxManage list runningvms | grep "${BOX}" >/dev/null; do
@@ -229,16 +206,6 @@ while VBoxManage list runningvms | grep "${BOX}" >/dev/null; do
 done
 
 echo ""
-
-# detach guest additions iso
-VBoxManage storageattach "${BOX}" \
-    --storagectl "IDE Controller" \
-    --port 1 \
-    --device 0 \
-    --type dvddrive \
-    --medium none
-    
-VBoxManage modifyvm "${BOX}" --natpf1 delete "guestssh"
 
 echo "Packaging and adding vagrant box ${BOX}"
 vagrant package --base "${BOX}"
